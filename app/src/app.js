@@ -1,4 +1,5 @@
 import express from "express";
+import pool, { createTable } from "./db.js";
 
 const app = express();
 
@@ -56,7 +57,24 @@ app.get("/skills", (req, res) => {
     tools: ["Git", "VS Code", "Rider", "Postman"],
   });
 });
+app.get("/visitors", async (req, res) => {
+  try {
+    const sql = "INSERT INTO visitors(ip_address) VALUES($1)";
+    await pool.query(sql, [req.ip]);
 
-app.listen(3000, (req, res) => {
+    const result = await pool.query("SELECT COUNT(*) FROM visitors");
+    res.status(200).json({
+      success: true,
+      totalVisitors: result.rows[0].count,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+app.listen(3000, async (req, res) => {
+  await createTable();
   console.log("app is listening on port 3000");
 });
