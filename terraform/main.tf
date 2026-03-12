@@ -10,6 +10,7 @@ resource "aws_instance" "portfolio_api" {
   ami = "ami-056335ec4a8783947"
   instance_type = "t3.micro"
   vpc_security_group_ids = [aws_security_group.portfolio_sg.id]
+  key_name = aws_key_pair.deployer.key_name
   tags = {
     Name= "portfolio-prod-1"
   }
@@ -44,4 +45,8 @@ resource "aws_security_group" "portfolio_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+}
+resource "aws_key_pair" "deployer" {
+  key_name = "albert's key"
+  public_key = file("~/.ssh/id_rsa.pub")
 }
